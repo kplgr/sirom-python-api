@@ -27,7 +27,6 @@ def main():
         print(args)
 
     print(f'Checking interface {args.interface} confuguration... ', end='')    
-    bus = canlib.LinuxCanBusTransport(args.interface)
 
     print('OK.')
 
@@ -40,7 +39,9 @@ def main():
 
 
     print(f'Sending command {command.type.name} to SIROM {args.device} over {args.interface}... ', end='')
-    bus.sendCommand(canbusTargetIdentifer=args.device, command=command, verbose=args.verbose)
+
+    with canlib.LinuxCanBusTransport(args.interface) as bus:
+        bus.sendCommand(canbusTargetIdentifer=args.device, command=command, verbose=args.verbose)
 
     print('Done! \n')
 

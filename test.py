@@ -12,19 +12,18 @@ cmdStop = SiromCommand(SiromCommandType.STOP)
 
 
 
+with LinuxCanBusTransport('can0') as bus:
 
-bus = LinuxCanBusTransport('can0')
+    commands = [cmdPowerOn, cmdOperate, cmdLatch, cmdStop, cmdRelease, cmdStop]
 
-commands = [cmdPowerOn, cmdOperate, cmdLatch, cmdStop, cmdRelease, cmdStop]
+    siromId = 0x01
 
-siromId = 0x01
+    for idc, command in enumerate(commands):
 
-for idc, command in enumerate(commands):
+        print(f"Sending bus command {idc+1}")
+        bus.sendCommand(siromId, command)
 
-    print(f"Sending bus command {idc+1}")
-    bus.sendCommand(siromId, command)
-
-    if command.type == SiromCommandType.GOTO_LAT or command.type == SiromCommandType.GOTO_RTC:
-        time.sleep(6)
-    
-    time.sleep(2)
+        if command.type == SiromCommandType.GOTO_LAT or command.type == SiromCommandType.GOTO_RTC:
+            time.sleep(6)
+        
+        time.sleep(2)

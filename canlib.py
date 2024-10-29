@@ -8,6 +8,9 @@ class CanBusTransport:
 
     def sendCommand(self, command: SiromCommand):
         raise NotImplemented()
+    
+    def shutdown(self):
+        raise NotImplemented()
 
 
 
@@ -29,7 +32,11 @@ class LinuxCanBusTransport(CanBusTransport):
 
         self.__canBus = can.interface.Bus(channel = identifier, bustype = 'socketcan')
 
-
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.shutdown()
 
     def sendCommand(self, canbusTargetIdentifer:int, command: SiromCommand, timeoutSeconds:int = 2, verbose=False):
         canMessage = can.Message(arbitration_id=canbusTargetIdentifer, extended_id=False, data=command.toByteArray())
@@ -39,5 +46,8 @@ class LinuxCanBusTransport(CanBusTransport):
             print("Sent message:" )
             print(canMessage)
 
+
+    def shutdown(self):
+        self.__canBus.shutdown()
             
 
